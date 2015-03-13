@@ -42,4 +42,6 @@ public class ScannerFragment extends Fragment {
 
         return rootView;
     }
+
+
 }

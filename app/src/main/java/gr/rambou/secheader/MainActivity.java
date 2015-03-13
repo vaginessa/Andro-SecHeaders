@@ -24,11 +24,29 @@
 
 package gr.rambou.secheader;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
+
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import gr.rambou.secheader.adapter.TabsPagerAdapter;
 
@@ -38,6 +56,7 @@ public class MainActivity extends ActionBarActivity implements
     private ViewPager viewPager;
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
+    private RequestQueue queue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,4 +114,199 @@ public class MainActivity extends ActionBarActivity implements
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
 
     }
+
+    public void Button_Clicked(View v) {
+        //find EditText View
+        EditText txt_website = (EditText) findViewById(R.id.txt_websites);
+
+        //Split string with comma and pass it into a string array
+        String[] websites = txt_website.getText().toString().split(",");
+
+        // Instantiate the RequestQueue.
+        queue = Volley.newRequestQueue(this);
+
+        //Start getting each website headers
+        for (String url : websites) {
+            //fix url
+            if (!url.toLowerCase().contains("http://") && !url.toLowerCase().contains("https://"))
+                url = "http://" + url.trim();
+            //get headers and analyze them
+            getHeader(url);
+        }
+
+    }
+
+    private void getHeader(String url) {
+        //Create a Listener for our requests
+        Response.Listener listener = new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                //We filter the headers and return the security ones
+                JSONObject newjson = FilterHeaders(response);
+
+                //Check if we need to save into database and then save
+                CheckBox cb = (CheckBox) findViewById(R.id.checkbox_save);
+                if (cb.isChecked()) {
+                    //We open or create our database
+                    SQLiteDatabase db = openOrCreateDatabase("headers.db", MODE_PRIVATE, null);
+
+                    //We create our table if doesn't exists
+                    db.execSQL("CREATE TABLE IF NOT EXISTS result(header VARCHAR, secure INTEGER, website VARCHAR);");
+                }
+
+
+                for (int i = 0; i < newjson.names().length(); i++) {
+                    try {
+                        Log.wtf("LOL", "key = " + newjson.names().getString(i) + " value = " + newjson.get(newjson.names().getString(i)));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                //Sending a toast to the user that we got all headers
+                /*Context context = getApplicationContext();
+                CharSequence text = "We Got all Headers!!!";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.setGravity(Gravity.CENTER | Gravity.CENTER, 0, 0);
+                toast.show();
+                */
+            }
+        };
+        //Create an Error Listener for our requests
+        Response.ErrorListener errorListener = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error.networkResponse != null) {
+                    Log.v("Error Response code", String.valueOf(error.networkResponse.statusCode));
+                }
+            }
+        };
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest stringRequest = new JsonObjectRequest(
+                Request.Method.HEAD, //We only want the headers, although it's similar with GET.
+                url, //our url
+                null, //JSONObject, idk wtf is this so putting it null...
+                listener, //our listener, handling our findings
+                errorListener) { //Error Listener to handle errors in requests
+
+            @Override
+            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    //We create a JSONObject and add the url address to it.
+                    org.json.JSONObject f = new JSONObject(response.headers).put("URL", this.getUrl());
+
+                    //We return the headers as a JSONObject
+                    return Response.success(f, HttpHeaderParser.parseCacheHeaders(response));
+                } catch (JSONException e) {
+                    return Response.error(new ParseError(e));
+                }
+
+            }
+
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
+    }
+
+    private JSONObject FilterHeaders(JSONObject headers) {
+        JSONObject newjson = new JSONObject();
+        for (int i = 0; i < headers.names().length(); i++) {
+            try {
+                String key = headers.names().getString(i), value = headers.get(headers.names().getString(i)).toString();
+
+                //We filter the header and keep only the ones that has to do with security!
+                switch (key) {
+                    //Header about Access Control
+                    case "Access-Control-Allow-Origin":
+                        if (value.equals("*"))
+                            newjson.put(key, "Not Secure");
+                        else
+                            newjson.put(key, "Secure");
+                        break;
+                    //All headers about CSP
+                    case "Content-Security-Policy":
+                        if (value.equals("*") || value.contains("-src *") || value.contains("*;"))
+                            newjson.put("CSP", "Not Secure");
+                        else
+                            newjson.put("CSP", "Secure");
+                        break;
+                    case "X-Webkit-CSP":
+                        if (value.equals("*") || value.contains("-src *") || value.contains("*;"))
+                            newjson.put("CSP", "Not Secure");
+                        else
+                            newjson.put("CSP", "Secure");
+                        break;
+                    //Cross Domain Meta Policy
+                    case "X-Permitted-Cross-Domain-Policies":
+                        newjson.put(key, "Secure");
+                        break;
+                    //Show your server information? Srsly?
+                    case "Server":
+                        newjson.put(key, "Not Secure");
+                        break;
+                    //Not using utf-8? Then probably somehow you'll get fucked...
+                    case "Content-Type":
+                        if (value.toLowerCase().contains("utf-8"))
+                            newjson.put(key, "Secure");
+                        else
+                            newjson.put(key, "Not Secure");
+                        break;
+                    //Frame Options, say no to clickjacking
+                    case "X-Frame-Options":
+                        newjson.put("Frame-Options", "Secure");
+                        break;
+                    case "Frame-Options":
+                        newjson.put(key, "Secure");
+                        break;
+                    //Show your software version information? Srsly?
+                    case "X-Powered-By":
+                        newjson.put(key, "Not Secure");
+                        break;
+                    //XSS Protection, good boy!
+                    case "X-XSS-Protection":
+                        if (value.contains("0"))
+                            newjson.put(key, "Not Secure");
+                        else
+                            newjson.put(key, "Secure");
+                        break;
+                    //say "no!" to MIME-sniffing
+                    case "X-Content-Type-Options":
+                        if (value.contains("nosniff"))
+                            newjson.put(key, "Secure");
+                        else
+                            newjson.put(key, "Not Secure");
+                        break;
+                    //Download Options
+                    case "X-Download-Options":
+                        newjson.put(key, "Secure");
+                        break;
+                    //HTTP Strict Transport Security, Show you care... use HTTPS everywhere!
+                    case "Strict-Transport-Security":
+                        newjson.put(key, "Secure");
+                        break;
+                    //Cookies for Fuck shake!!!
+                    case "Set-Cookie":
+                        newjson.put(key, "Secure");
+                        break;
+                    //Blogging and DDOS, watch the Pingback.
+                    case "X-Pingback":
+                        newjson.put(key, "Secure");
+                        break;
+                    case "URL":
+                        newjson.put(key, value.replace("https://", "").replace("http://", ""));
+                    default:
+                        //We remove headers that has nothing to do with Security
+                        //headers.remove(key);
+                        //Log.wtf("LOL", "key = " + key + " value = " + value);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return newjson;
+    }
+
 }
