@@ -15,7 +15,6 @@ The app will filter all headers to find the ones for security. Those will be fil
 + __X-XSS-Protection__ - Cross site scripting heuristic filter for IE/Chrome.
 + __X-Content-Type-Options__ - Prevent content type sniffing "__NoSniff__".
 + __X-Download-Options__ - Prevent file downloads opening.
-+ __X-Permitted-Cross-Domain-Policies__ - Restrict Adobe Flash Player's access to data.
 + __HTTP Strict Transport Security (HSTS)__ - Ensures the browser never visits the http version of a website. Protects SSLStrip/Firesheep attacks. HSTS Specification
 + __Secure Cookies__ - Ensure that the server knows the client. Checking the use of __Set-Cookie2__ along to the insecure __Set-Cookie__.
 + __X-Pingback__ - Header for blogs, a url that allows other sites that link to that site/site's article to tell the site that it did link to that site. Before adding it, used for DDOS attacks.
