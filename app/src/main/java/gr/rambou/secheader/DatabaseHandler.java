@@ -24,13 +24,16 @@
 
 package gr.rambou.secheader;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
-/**
- * Created by Nickos on 14/3/2015.
- */
+import java.util.HashMap;
+import java.util.Map;
+
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     // All Static variables
@@ -38,26 +41,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Database Name
-    private static final String DATABASE_NAME = "contactsManager";
+    private static final String DATABASE_NAME = "headers";
 
     // Contacts table name
-    private static final String TABLE_CONTACTS = "contacts";
+    private static final String TABLE = "result";
 
     // Contacts Table Columns names
-    private static final String KEY_ID = "id";
-    private static final String KEY_NAME = "name";
-    private static final String KEY_PH_NO = "phone_number";
+    private static final String KEY_WEBSITE = "website";
+    private static final String KEY_HEADER = "secure";
+    private static final String KEY_SECURE = "header";
 
     public DatabaseHandler(Context context) {
+        //We open or create our database
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_CONTACTS + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT,"
-                + KEY_PH_NO + " TEXT" + ")";
+        //We create our table if doesn't exists
+        String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE + "("
+                + KEY_WEBSITE + " VARCHAR," + KEY_HEADER + " VARCHAR,"
+                + KEY_SECURE + " INTEGER, PRIMARY KEY (" + KEY_WEBSITE + ", " + KEY_HEADER + "))";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
 
@@ -65,9 +70,55 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE);
 
         // Create tables again
         onCreate(db);
     }
+
+    // Adding new result
+    public void addResult(String website, String header, int secure) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Gather all values
+        ContentValues values = new ContentValues();
+        values.put(KEY_WEBSITE, website);
+        values.put(KEY_HEADER, header);
+        values.put(KEY_SECURE, secure);
+
+        // Inserting Row
+        db.insert(TABLE, null, values);
+
+        // Close database connection
+        db.close();
+    }
+
+    public void getResult() {
+        return;
+    }
+
+    public Map<String, String> getResultByURL(String URL) {
+        Map<String, String> HeaderList = new HashMap<String, String>();
+        // Select All Query
+        String selectQuery = "SELECT  " + KEY_HEADER + " FROM " + TABLE + " WHERE " + KEY_WEBSITE + "='" + URL + "'";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                HeaderList.put(",", cursor.getString(0));
+
+                Log.v("LOL", cursor.getString(0));
+                /*contact.setID(Integer.parseInt(cursor.getString(0)));
+                contact.setName(cursor.getString(1));
+                contact.setPhoneNumber(cursor.getString(2));*/
+            } while (cursor.moveToNext());
+        }
+
+        // return contact list
+        return HeaderList;
+    }
+
 }

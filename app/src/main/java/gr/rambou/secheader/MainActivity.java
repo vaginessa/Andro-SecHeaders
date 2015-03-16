@@ -24,16 +24,19 @@
 
 package gr.rambou.secheader;
 
-import android.database.sqlite.SQLiteDatabase;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -57,6 +60,7 @@ public class MainActivity extends ActionBarActivity implements
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
     private RequestQueue queue;
+    private int requests; //number that track requests
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +129,17 @@ public class MainActivity extends ActionBarActivity implements
         // Instantiate the RequestQueue.
         queue = Volley.newRequestQueue(this);
 
+        //Set requests number
+        requests = websites.length;
+
+        //Disable Buttons functionality
+        (findViewById(R.id.button_scan)).setEnabled(false);
+        (findViewById(R.id.checkbox_save)).setEnabled(false);
+
+        //Initialize progressBar
+        ((ProgressBar) findViewById(R.id.progressBar)).setMax(requests);
+        ((ProgressBar) findViewById(R.id.progressBar)).setProgress(0);
+
         //Start getting each website headers
         for (String url : websites) {
             //fix url
@@ -140,36 +155,59 @@ public class MainActivity extends ActionBarActivity implements
         //Create a Listener for our requests
         Response.Listener listener = new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONObject response) {
-                //We filter the headers and return the security ones
-                JSONObject newjson = FilterHeaders(response);
-
-                //Check if we need to save into database and then save
+            public void onResponse(JSONObject newjson) {
+                //Check if we need to save into database
                 CheckBox cb = (CheckBox) findViewById(R.id.checkbox_save);
                 if (cb.isChecked()) {
-                    //We open or create our database
-                    SQLiteDatabase db = openOrCreateDatabase("headers.db", MODE_PRIVATE, null);
+                    //We open/create our sqlite database
+                    DatabaseHandler mydb = new DatabaseHandler(getApplicationContext());
 
-                    //We create our table if doesn't exists
-                    db.execSQL("CREATE TABLE IF NOT EXISTS result(header VARCHAR, secure INTEGER, website VARCHAR);");
+                    //Delete the old database - [for debug reasons]
+                    mydb.onUpgrade(mydb.getWritableDatabase(), 0, 1);
+
+                    //Loop over all results
+                    for (int i = 0; i < newjson.names().length(); i++) {
+                        try {
+                            //Check if the value is URL and don't insert it into db
+                            String value = newjson.names().getString(i).toString();
+                            if (!value.equals("URL"))
+                                //Add result into database
+                                mydb.addResult(newjson.getString("URL"), value, (newjson.get(newjson.names().getString(i)).equals("Secure")) ? 1 : 0);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
-
-                for (int i = 0; i < newjson.names().length(); i++) {
+                /*for (int i = 0; i < newjson.names().length(); i++) {
                     try {
                         Log.wtf("LOL", "key = " + newjson.names().getString(i) + " value = " + newjson.get(newjson.names().getString(i)));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                }*/
+
+                //decrease requests value;
+                requests--;
+
+                //Update progressBar
+                int max = ((ProgressBar) findViewById(R.id.progressBar)).getMax();
+                ((ProgressBar) findViewById(R.id.progressBar)).setProgress(max - requests);
+
+                //Check if we finished
+                if (requests == 1) {
+                    //Sending a toast to the user that we got all headers
+                    Context context = getApplicationContext();
+                    CharSequence text = "We Got all Headers!!!";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.setGravity(Gravity.CENTER | Gravity.CENTER, 0, 0);
+                    toast.show();
+                    //Re-Enable Buttons functionality
+                    (findViewById(R.id.button_scan)).setEnabled(true);
+                    (findViewById(R.id.checkbox_save)).setEnabled(true);
                 }
-                //Sending a toast to the user that we got all headers
-                /*Context context = getApplicationContext();
-                CharSequence text = "We Got all Headers!!!";
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.setGravity(Gravity.CENTER | Gravity.CENTER, 0, 0);
-                toast.show();
-                */
+
             }
         };
         //Create an Error Listener for our requests
@@ -196,21 +234,22 @@ public class MainActivity extends ActionBarActivity implements
                     //We create a JSONObject and add the url address to it.
                     org.json.JSONObject f = new JSONObject(response.headers).put("URL", this.getUrl());
 
-                    //We return the headers as a JSONObject
-                    return Response.success(f, HttpHeaderParser.parseCacheHeaders(response));
+                    /*We return the headers as a JSONObject which,
+                    we filter the headers and return the security ones*/
+                    return Response.success(FilterHeaders(f), HttpHeaderParser.parseCacheHeaders(response));
                 } catch (JSONException e) {
                     return Response.error(new ParseError(e));
                 }
-
             }
 
         };
 
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
+
     }
 
-    private JSONObject FilterHeaders(JSONObject headers) {
+    private JSONObject FilterHeaders(JSONObject headers) { //headers
         JSONObject newjson = new JSONObject();
         for (int i = 0; i < headers.names().length(); i++) {
             try {
@@ -298,8 +337,7 @@ public class MainActivity extends ActionBarActivity implements
                         newjson.put(key, value.replace("https://", "").replace("http://", ""));
                     default:
                         //We remove headers that has nothing to do with Security
-                        //headers.remove(key);
-                        //Log.wtf("LOL", "key = " + key + " value = " + value);
+                        //newjson.remove(key);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
