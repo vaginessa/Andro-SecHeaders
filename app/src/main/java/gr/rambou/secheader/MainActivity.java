@@ -60,7 +60,8 @@ public class MainActivity extends ActionBarActivity implements
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
     private RequestQueue queue;
-    private int requests; //number that track requests
+    //number that track requests
+    private int requests;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,9 +162,6 @@ public class MainActivity extends ActionBarActivity implements
                 if (cb.isChecked()) {
                     //We open/create our sqlite database
                     DatabaseHandler mydb = new DatabaseHandler(getApplicationContext());
-
-                    //Delete the old database - [for debug reasons]
-                    mydb.onUpgrade(mydb.getWritableDatabase(), 0, 1);
 
                     //Loop over all results
                     for (int i = 0; i < newjson.names().length(); i++) {
