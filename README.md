@@ -1,5 +1,12 @@
 #Android SecHeaders
 
+##Table of Contents
+1.[Headers to Examine](https://github.com/A1fus/A1fus.github.io#Headers to Examine)
+
+2.[References](https://github.com/A1fus/A1fus.github.io#References)
+
+3.[License](https://github.com/A1fus/A1fus.github.io#License)
+
 ###Info
 An app for android 4.1+ that takes as an input some websites and then gathers, filter, visualize and generate statistics of their Security Headers. It's started as a mini-project for the course of "Mobile and Wireless Networks Security" at the Department of Information & Communication Systems Engineering, University of Aegean. So don't expect anything fancy lads. :bowtie:
 
