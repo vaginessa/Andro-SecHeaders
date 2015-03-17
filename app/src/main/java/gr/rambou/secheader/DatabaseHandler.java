@@ -29,10 +29,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -48,8 +46,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Contacts Table Columns names
     private static final String KEY_WEBSITE = "website";
-    private static final String KEY_HEADER = "secure";
-    private static final String KEY_SECURE = "header";
+    private static final String KEY_HEADER = "header";
+    private static final String KEY_SECURE = "secure";
 
     public DatabaseHandler(Context context) {
         //We open or create our database
@@ -93,14 +91,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void getResult() {
-        return;
-    }
-
-    public Map<String, String> getResultByURL(String URL) {
-        Map<String, String> HeaderList = new HashMap<String, String>();
+    //Return all unique headers or Website names
+    public String[] getColumnValues(Type type) {
+        String[] results = null;
         // Select All Query
-        String selectQuery = "SELECT  " + KEY_HEADER + " FROM " + TABLE + " WHERE " + KEY_WEBSITE + "='" + URL + "'";
+        String selectQuery;
+        if (type.equals(Type.KEY_HEADER))
+            selectQuery = "SELECT  distinct" + KEY_HEADER + " FROM " + TABLE;
+        else
+            selectQuery = "SELECT  distinct" + KEY_WEBSITE + " FROM " + TABLE;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -108,17 +107,55 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                HeaderList.put(",", cursor.getString(0));
-
-                Log.v("LOL", cursor.getString(0));
-                /*contact.setID(Integer.parseInt(cursor.getString(0)));
-                contact.setName(cursor.getString(1));
-                contact.setPhoneNumber(cursor.getString(2));*/
+                results[cursor.getPosition() - 1] = cursor.getString(0);
             } while (cursor.moveToNext());
         }
 
-        // return contact list
-        return HeaderList;
+        return results;
+    }
+
+    //Return an array of how many headers where secure, and the amount of time the header appeared
+    public HashMap<String, String[]> getHeadersStats() {
+        HashMap<String, String[]> results = new HashMap<>();
+        // Select All Query
+        String selectQuery = "SELECT " + KEY_HEADER + "," + "sum(" + KEY_SECURE + ")," + "count(" + KEY_SECURE + ") FROM "
+                + TABLE + " GROUP BY " + KEY_HEADER;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                results.put(cursor.getString(0), new String[]{cursor.getString(1), cursor.getString(2)});
+            } while (cursor.moveToNext());
+        }
+
+        return results;
+    }
+
+    //Return Headers from a specific website
+    public HashMap<String, String> getHeader(String Domain) {
+        HashMap<String, String> results = new HashMap<>();
+        // Select All Query
+        String selectQuery = "SELECT " + KEY_HEADER + "," + KEY_SECURE + " FROM "
+                + TABLE + " WHERE " + KEY_WEBSITE + "='" + Domain + "'";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                results.put(cursor.getString(0), cursor.getString(1));
+            } while (cursor.moveToNext());
+        }
+
+        return results;
+    }
+
+    enum Type {
+        KEY_HEADER, KEY_WEBSITE
     }
 
 }
