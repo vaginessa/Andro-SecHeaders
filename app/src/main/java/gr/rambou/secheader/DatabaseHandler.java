@@ -93,21 +93,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     //Return all unique headers or Website names
     public String[] getColumnValues(Type type) {
-        String[] results = null;
         // Select All Query
         String selectQuery;
         if (type.equals(Type.KEY_HEADER))
-            selectQuery = "SELECT  distinct" + KEY_HEADER + " FROM " + TABLE;
+            selectQuery = "SELECT  distinct " + KEY_HEADER + " FROM " + TABLE;
         else
-            selectQuery = "SELECT  distinct" + KEY_WEBSITE + " FROM " + TABLE;
+            selectQuery = "SELECT  distinct " + KEY_WEBSITE + " FROM " + TABLE;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
+        String[] results = new String[cursor.getCount()];
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                results[cursor.getPosition() - 1] = cursor.getString(0);
+                results[cursor.getPosition()] = cursor.getString(0);
             } while (cursor.moveToNext());
         }
 
@@ -115,11 +115,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     //Return an array of how many headers where secure, and the amount of time the header appeared
-    public HashMap<String, String[]> getHeadersStats() {
+    public HashMap<String, String[]> getAllHeadersStats() {
         HashMap<String, String[]> results = new HashMap<>();
         // Select All Query
         String selectQuery = "SELECT " + KEY_HEADER + "," + "sum(" + KEY_SECURE + ")," + "count(" + KEY_SECURE + ") FROM "
                 + TABLE + " GROUP BY " + KEY_HEADER;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                results.put(cursor.getString(0), new String[]{cursor.getString(1), cursor.getString(2)});
+            } while (cursor.moveToNext());
+        }
+
+        return results;
+    }
+
+    //Return an array of how many headers where secure, and the amount of times header appeared
+    public HashMap<String, String[]> getWebHeadersStats(String Domain) {
+        HashMap<String, String[]> results = new HashMap<>();
+        // Select All Query
+        String selectQuery = "SELECT " + KEY_HEADER + "," + "sum(" + KEY_SECURE + ")," + "count(" + KEY_SECURE + ") FROM "
+                + TABLE + "WHERE " + KEY_WEBSITE + "='" + Domain + "' GROUP BY " + KEY_HEADER;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -154,7 +174,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return results;
     }
 
-    enum Type {
+    public enum Type {
         KEY_HEADER, KEY_WEBSITE
     }
 

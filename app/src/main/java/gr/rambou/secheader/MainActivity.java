@@ -176,8 +176,8 @@ public class MainActivity extends ActionBarActivity implements
                         }
                     }
                 }
-
-                /*for (int i = 0; i < newjson.names().length(); i++) {
+                /*
+                for (int i = 0; i < newjson.names().length(); i++) {
                     try {
                         Log.wtf("LOL", "key = " + newjson.names().getString(i) + " value = " + newjson.get(newjson.names().getString(i)));
                     } catch (JSONException e) {

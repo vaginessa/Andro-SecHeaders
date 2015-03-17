@@ -24,6 +24,8 @@
 
 
 
+
+
 apply plugin: 'com.android.application'
 
 android {
@@ -50,4 +52,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     //It's not official but a mirror copy of official Volley. It's regularly synced and updated with official.
     compile 'com.mcxiaoke.volley:library:1.+'
+    //Added HelloChart lib for Charts
+    compile 'com.github.lecho:hellocharts-library:+@aar'
 }
