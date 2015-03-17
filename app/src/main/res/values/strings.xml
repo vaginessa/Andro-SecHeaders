@@ -34,4 +34,5 @@
     <string name="txt_about_title">Security Headers that scanned</string>
     <!--<string name="txt_websites">google.com</string>-->
     <string name="txt_websites">google.com,facebook.com,youtube.com,baidu.com,yahoo.com,amazon.com,wikipedia.org,twitter.com,taobao.com,qq.com</string>
+    <string name="made_by">Made by Rambou (Bousios Nikolaos)</string>
 </resources>
