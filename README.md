@@ -8,7 +8,7 @@
 3.[License](https://github.com/Rambou/Andro-SecHeaders#license)
 
 ###Info
-An app for android 4.1+ that takes as an input some websites and then gathers, filter, visualize and generate statistics of their Security Headers. It's started as a mini-project for the course of "Mobile and Wireless Networks Security" at the Department of Information & Communication Systems Engineering, University of Aegean. So don't expect anything fancy lads. :bowtie:
+An app for android 4.1+ that takes as an input some websites and then gathers, filter, visualize and generate statistics of their Security Headers. It's started as a mini-project for the course of "Mobile and Wireless Networks Security" at the Department of Information & Communication Systems Engineering, University of Aegean. So don't expect anything fancy lads. :bowtie: Also the project build with Android Studio IDE, if you want to you can import it to eclipse (needs to be converted).
 
 ###Headers to Examine
 The app will filter all headers to find the ones for security. Those will be filterd are 10 and mentioned above. :wink:
