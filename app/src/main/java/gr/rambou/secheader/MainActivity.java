@@ -222,7 +222,6 @@ public class MainActivity extends ActionBarActivity implements
         JsonObjectRequest stringRequest = new JsonObjectRequest(
                 Request.Method.HEAD, //We only want the headers, although it's similar with GET.
                 url, //our url
-                null, //JSONObject, idk wtf is this so putting it null...
                 listener, //our listener, handling our findings
                 errorListener) { //Error Listener to handle errors in requests
 

@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import gr.rambou.secheader.DatabaseHandler;
 import gr.rambou.secheader.R;
@@ -45,10 +46,13 @@ import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
+import lecho.lib.hellocharts.model.PieChartData;
+import lecho.lib.hellocharts.model.SliceValue;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
+import lecho.lib.hellocharts.view.PieChartView;
 import lecho.lib.hellocharts.view.PreviewColumnChartView;
 
 public class StatsFragment extends Fragment {
@@ -56,6 +60,8 @@ public class StatsFragment extends Fragment {
     private ColumnChartView chart;
     private PreviewColumnChartView previewChart;
     private ColumnChartData data;
+    private PieChartView pchart;
+    private PieChartData pdata;
     private TextView stats_txt;
     private Button reload;
     //Deep copy of data.
@@ -67,7 +73,10 @@ public class StatsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_stats, container, false);
         chart = (ColumnChartView) rootView.findViewById(R.id.chart);
         previewChart = (PreviewColumnChartView) rootView.findViewById(R.id.chart_preview);
-        stats_txt = (TextView) rootView.findViewById(R.id.stats_txt);
+
+        //Initialize Pie Chart and its touch listener
+        pchart = (PieChartView) rootView.findViewById(R.id.piechart);
+        //pchart.setOnValueTouchListener(new ValueTouchListener());
 
         reload = (Button) rootView.findViewById(R.id.reload_btn);
         reload.setOnClickListener(new View.OnClickListener() {
@@ -83,7 +92,8 @@ public class StatsFragment extends Fragment {
 
     public void loadChart() {
         // Generate data for previewed chart and copy of that data for preview chart.
-        generateDefaultData();
+        generateChartData();
+        generatePieChartData();
 
         chart.setColumnChartData(data);
         // Disable zoom/scroll for previewed chart, visible chart ranges depends on preview chart viewport so
@@ -97,7 +107,7 @@ public class StatsFragment extends Fragment {
         previewX(false);
     }
 
-    private void generateDefaultData() {
+    private void generateChartData() {
         int numSubcolumns = 2;
         int numColumns = 10;
 
@@ -145,6 +155,35 @@ public class StatsFragment extends Fragment {
 
     }
 
+    private void generatePieChartData() {
+        //hasLabelsOutside
+        pchart.setCircleFillRatio(0.7f);
+
+        //We open/create our sqlite database
+        DatabaseHandler mydb = new DatabaseHandler(getActivity().getApplicationContext());
+        //We get the column with websites
+        HashMap<String, String[]> HeaderStats = mydb.getAllHeadersStats();
+        Set<Map.Entry<String, String[]>> keys = HeaderStats.entrySet();
+
+        List<SliceValue> values = new ArrayList<>();
+        for (Map.Entry<String, String[]> key : keys) {
+            int occurred = Integer.parseInt(key.getValue()[1]);
+            int secure = Integer.parseInt(key.getValue()[0]);
+
+            SliceValue sliceValue = new SliceValue(occurred, ChartUtils.pickColor());
+            float secure_percent = (float) (secure / occurred) * 100;
+            values.add(sliceValue.setLabel(key.getKey() + " " + secure_percent + "%"));
+        }
+
+        pdata = new PieChartData(values);
+        pdata.setHasLabels(true);
+        pdata.setHasLabelsOnlyForSelected(false);
+        pdata.setHasLabelsOutside(true);
+
+        //set pieChart's data
+        pchart.setPieChartData(pdata);
+    }
+
     private void previewX(boolean animate) {
         Viewport tempViewport = new Viewport(chart.getMaximumViewport());
         float dx = tempViewport.width() / 4;
@@ -171,4 +210,5 @@ public class StatsFragment extends Fragment {
         }
 
     }
+
 }
