@@ -326,6 +326,10 @@ public class MainActivity extends ActionBarActivity implements
                     case "Set-Cookie":
                         newjson.put(key, "Secure");
                         break;
+                    //p3p Platform for Privacy Preferences
+                    case "p3p":
+                        newjson.put(key, "Secure");
+                        break;
                     //Blogging and DDOS, watch the Pingback.
                     case "X-Pingback":
                         newjson.put(key, "Secure");
