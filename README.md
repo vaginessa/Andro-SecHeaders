@@ -10,6 +10,11 @@
 ###Info
 An app for android 4.1+ that takes as an input some websites and then gathers, filter, visualize and generate statistics of their Security Headers. It's started as a mini-project for the course of "Mobile and Wireless Networks Security" at the Department of Information & Communication Systems Engineering, University of Aegean. So don't expect anything fancy lads. :bowtie: Also the project build with Android Studio IDE, if you want to you can import it to eclipse (needs to be converted).
 
+<p align="center">
+<img src="https://cloud.githubusercontent.com/assets/4427553/6771116/409d128e-d0de-11e4-8da8-07aa8e9d6179.png" alt="Scanning" width="300"/>
+<img src="https://cloud.githubusercontent.com/assets/4427553/6771117/421f4334-d0de-11e4-81e1-d73f55a41c3b.png" alt="Statistics" width="300"/>
+</p>
+
 ###Headers to Examine
 The app will filter all headers to find the ones for security. Those will be filterd are 10 and mentioned above. :wink:
 + __Access Control Allow Origin__ - When Site A tries to fetch content from Site B, Site B can send an Access-Control-Allow-Origin response header to tell the browser that the content of this page is accessible to certain origins.
