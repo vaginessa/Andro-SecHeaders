@@ -16,7 +16,7 @@ An app for android 4.1+ that takes as an input some websites and then gathers, f
 </p>
 
 ###Headers to Examine
-The app will filter all headers to find the ones for security. Those will be filterd are 10 and mentioned above. :wink:
+The app will filter all headers to find the ones for security. Those will be filtered are 10 and mentioned above. :wink:
 + __Access Control Allow Origin__ - When Site A tries to fetch content from Site B, Site B can send an Access-Control-Allow-Origin response header to tell the browser that the content of this page is accessible to certain origins.
 + __Content Security Policy (CSP)__ - Helps detect/prevent XSS, mixed-content, and other classes of attack. CSP 1.1 Specification.
 + __Cross Domain Meta Policy__ - Tells Flash and PDF files which Cross Domain Policy files found on your site can be obeyed; yes, it's a policy about other policies!
