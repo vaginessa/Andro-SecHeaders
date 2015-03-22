@@ -25,6 +25,7 @@ The app will filter all headers to find the ones for security. Those will be fil
 + __HTTP Strict Transport Security (HSTS)__ - Ensures the browser never visits the http version of a website. Protects SSLStrip/Firesheep attacks. HSTS Specification
 + __Secure Cookies__ - Ensure that the server knows the client. Checking the use of __Set-Cookie2__ along to the insecure __Set-Cookie__.
 + __X-Pingback__ - Header for blogs, a url that allows other sites that link to that site/site's article to tell the site that it did link to that site. Before adding it, used for DDOS attacks.
++ __P3P__ - Header for Platform for Privacy Preferences.
 
 ##References
 * Course: http://www.icsd.aegean.gr/icsd_en/proptyxiaka/istoselida_mathimatos.php?lesson_id=321-10752
