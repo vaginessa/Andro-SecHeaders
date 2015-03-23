@@ -29,6 +29,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import gr.rambou.secheader.tabs.AboutFragment;
+import gr.rambou.secheader.tabs.ResultFragment;
 import gr.rambou.secheader.tabs.ScannerFragment;
 import gr.rambou.secheader.tabs.StatsFragment;
 
@@ -47,8 +48,11 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
                 return new ScannerFragment();
             case 1:
                 // Statistics fragment activity
-                return new StatsFragment();
+                return new ResultFragment();
             case 2:
+                // Statistics fragment activity
+                return new StatsFragment();
+            case 3:
                 // About fragment activity
                 return new AboutFragment();
         }
@@ -59,7 +63,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         // get item count - equal to number of tabs
-        return 3;
+        return 4;
     }
 
 }

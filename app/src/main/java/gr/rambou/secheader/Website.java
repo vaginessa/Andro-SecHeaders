@@ -22,44 +22,27 @@
  * SOFTWARE.
  */
 
+package gr.rambou.secheader;
 
+/**
+ * Created by Nickos on 23/3/2015.
+ */
+public class Website {
+    private String website;
+    private String info;
 
-
-
-
-
-
-
-apply plugin: 'com.android.application'
-
-android {
-    compileSdkVersion 22
-    buildToolsVersion '22.0.0'
-    defaultConfig {
-        applicationId "gr.rambou.secheader"
-        minSdkVersion 16
-        targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+    public Website(String website, String info) {
+        this.info = info;
+        this.website = website;
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-    productFlavors {
-    }
-}
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:+'
-    //It's not official but a mirror copy of official Volley. It's regularly synced and updated with official.
-    compile 'com.mcxiaoke.volley:library:1.+'
-    //Added HelloChart lib for Charts
-    compile 'com.github.lecho:hellocharts-library:+@aar'
-    //Adding CardList view
-    compile 'com.android.support:cardview-v7:+'
-    compile 'com.android.support:recyclerview-v7:+'
+    public String getWebsite() {
+        return website;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+
 }

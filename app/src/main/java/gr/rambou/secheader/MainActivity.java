@@ -78,7 +78,7 @@ public class MainActivity extends ActionBarActivity implements
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Adding Tab's Tittles
-        String[] tabs = {getString(R.string.scan), getString(R.string.results) ,getString(R.string.stats), getString(R.string.about)};
+        String[] tabs = {getString(R.string.scan), getString(R.string.results), getString(R.string.stats), getString(R.string.about)};
         for (String tab_name : tabs) {
             actionBar.addTab(actionBar.newTab().setText(tab_name)
                     .setTabListener(this));
