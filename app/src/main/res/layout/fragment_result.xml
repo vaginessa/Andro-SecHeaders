@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ The MIT License (MIT)
   ~
@@ -22,18 +23,8 @@
   ~ SOFTWARE.
   -->
 
-<resources>
-    <string name="app_name">SecHeaders</string>
-    <string name="Activity_name">Security Headers</string>
-    <string name="scan">Scan</string>
-    <string name="results">Result</string>
-    <string name="stats">Stats</string>
-    <string name="about">About</string>
-    <string name="btn_scan">Start Scan</string>
-    <string name="cbx_save">Save into database?</string>
-    <string name="txt_headers">Access Control Allow Origin, Content Security Policy (CSP), Cross Domain Meta Policy, Server Information, UTF-8 Character Encoding, X-Frame-Options (XFO), X-Powered-By, X-XSS-Protection, X-Content-Type-Options, X-Download-Options, X-Permitted-Cross-Domain-Policies, HTTP Strict Transport Security (HSTS),Secure Cookies, X-Pingback</string>
-    <string name="txt_about_title">Security Headers that scanned</string>
-    <!--<string name="txt_websites">google.com</string>-->
-    <string name="txt_websites">google.com,facebook.com,youtube.com,baidu.com,yahoo.com,amazon.com,wikipedia.org,twitter.com,taobao.com,qq.com</string>
-    <string name="made_by">Made by Rambou (Bousios Nikolaos)</string>
-</resources>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical">
+
+</LinearLayout>
