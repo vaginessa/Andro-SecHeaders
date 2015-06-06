@@ -5,7 +5,10 @@
 
 2.[References](https://github.com/Rambou/Andro-SecHeaders#references)
 
-3.[License](https://github.com/Rambou/Andro-SecHeaders#license)
+3.[Play Store](https://github.com/Rambou/Andro-SecHeaders#playstore)
+
+4.[License](https://github.com/Rambou/Andro-SecHeaders#license)
+
 
 ###Info
 An app for android 4.1+ that takes as an input some websites and then gathers, filter, visualize and generate statistics of their Security Headers. It's started as a mini-project for the course of "Mobile and Wireless Networks Security" at the Department of Information & Communication Systems Engineering, University of Aegean. So don't expect anything fancy lads. :bowtie: Also the project build with Android Studio IDE, if you want to you can import it to eclipse (needs to be converted).
@@ -37,6 +40,10 @@ The app will filter all headers to find the ones for security. Those will be fil
 * Department: http://www.icsd.aegean.gr/icsd_en/
 * Secure Headers: https://securityheaders.com/
 * OWASP: https://www.owasp.org/index.php/List_of_useful_HTTP_headers
+
+##PlayStore
+https://play.google.com/store/apps/details?id=gr.rambou.secheader
+
 
 ##License
 Android SecHeaders, are released under the terms of the [MIT license](http://en.wikipedia.org/wiki/MIT_License).
