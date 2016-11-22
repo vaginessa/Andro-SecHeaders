@@ -33,12 +33,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion '22.0.0'
+    compileSdkVersion 24
+    buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "gr.rambou.secheader"
         minSdkVersion 16
-        targetSdkVersion 22
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
@@ -53,7 +53,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:+'
     //It's not official but a mirror copy of official Volley. It's regularly synced and updated with official.
     compile 'com.mcxiaoke.volley:library:1.+'
